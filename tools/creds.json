@@ -1,0 +1,6 @@
+{
+	"login" : "<Your Mail Serv login>",
+	"passw" : "<Your Mail Serv password>",
+	"servr" : "<Your Mail Serv address>",
+	"domain": "<Your Mail Serv domain>"
+}
