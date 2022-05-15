@@ -9,7 +9,7 @@ import argparse
 import time
 import json
 
-def send_mail_test(json_line, body_file):
+def send_mail_test(json_line, body_text):
     fj = open("tools/creds.json", 'r')
     creds = json.load(fj)
 
@@ -40,10 +40,9 @@ def send_mail_test(json_line, body_file):
     msg['MIME-Version'] = '1.0'
     msg['Content-Transfer-Encoding'] = 'base64' # This a CRITICAL option. XSS won't launch without it. With just Pure HTML text all JS will be deleted via render phase
 
-    d1 = get_text(body_file)
-    t1 = Template(d1)
-    c1 = t1.substitute(email=to_mail, fio=person_name, uuid=uuid)
-    msg.set_payload(c1)
+    email_template = Template(body_text)
+    email_payload = email_template.substitute(email=to_mail, fio=person_name, uuid=uuid)
+    msg.set_payload(email_payload)
 
     with SMTP(str(creds['servr'])) as smtp:
         smtp.set_debuglevel(1)
@@ -69,8 +68,9 @@ def get_lines_fror_json(email_file):
 def process(email_file, body_file):
     timeout = 60
     jss = get_lines_fror_json(email_file)
+    body_text = get_text(body_file)
     for js in jss:
-        send_mail_test(js, body_file)
+        send_mail_test(js, body_text)
         # The timeout is necessary as a common SMTP server with 2Gbs won't process quickier if your list of emails is big.
         print("\n Sleeping between emails for " + timeout + " seconds\n")
         time.sleep(timeout)
